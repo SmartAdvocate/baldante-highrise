@@ -1,6 +1,16 @@
 use SATenantConsolidated_Tabs3_and_MyCase
 go
 
+set quoted_identifier on
+go
+
+--SELECT * FROM baldante_highrise.conversion.contacttags
+
+
+--select distinct sti.StateID FROM sma_TRN_Incidents sti
+--join sma_TRN_Cases stc on sti.CaseId = stc.casnCaseID where stc.source_db='highrise'
+
+--SELECT * FROM sma_MST_States sms
 
 /* ------------------------------------------------------------------------------
 Insert [sma_TRN_Incidents]
@@ -47,10 +57,12 @@ insert into [sma_TRN_Incidents]
 		GETDATE()	   as [dtcreated],
 		null		   as [modifyuserid],
 		null		   as [dtmodified]
+	select *
 	from Baldante_Highrise..contacts c
 	join [sma_TRN_cases] cas
 		on cas.source_id = CONVERT(VARCHAR, c.id)
 		and cas.source_db = 'highrise'
+	left join [baldante_highrise].conversion.contacttags ct on ct.companY_name = c.company_name
 go
 
 alter table [sma_TRN_Incidents] enable trigger all

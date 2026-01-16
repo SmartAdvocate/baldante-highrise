@@ -1,4 +1,7 @@
-use SATenantConsolidated_Tabs3_and_MyCase;
+use SATenantConsolidated_Tabs3_and_MyCase
+go
+
+set quoted_identifier on
 go
 
 /*===========================================================================

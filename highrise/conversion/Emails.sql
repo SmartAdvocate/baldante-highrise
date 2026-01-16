@@ -1,6 +1,8 @@
 use SATenantConsolidated_Tabs3_and_MyCase
 go
 
+set quoted_identifier on
+go
 
 if OBJECT_ID('dbo.stg_Highrise_Emails', 'U') is not null
 	drop table dbo.stg_Highrise_Emails;

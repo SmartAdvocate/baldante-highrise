@@ -8,7 +8,8 @@ go
 --select * from Baldante_Highrise..notes where company_id = 341408048
 --select * from Baldante_Highrise..company c where id = 341408048
 
-
+set quoted_identifier on
+go
 
 if OBJECT_ID('dbo.stg_Highrise_Notes', 'U') is not null
 	drop table dbo.stg_Highrise_Notes;

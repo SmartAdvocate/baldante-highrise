@@ -14,6 +14,8 @@ go
 --on t.contact_id = c.id
 --join Baldante_Consolidated..sma_TRN_Cases cas on cas.cassCaseNumber = c.company_name and cas.source_db = 'tabs3'
 
+set quoted_identifier on
+go
 
 
 /* ------------------------------------------------------------------------------

@@ -61,3 +61,25 @@ SELECT * FROM Baldante_Consolidated..sma_MST_CaseSubTypeCode smcstc
 
 SELECT * FROM Baldante_Consolidated..sma_MST_SubRole smsr
 SELECT * FROM Baldante_Consolidated..sma_mst_SubRoleCode smsrc --order by smsrc.srcsDscrptn
+
+
+
+/*----------------------------------------------------------
+2026.01.13
+
+*/
+
+SELECT * FROM CaseTypeMap ctm order by ctm.SA_Case_Group desc
+
+-- groups
+SELECT distinct ctm.SA_Case_Group FROM CaseTypeMap ctm order by ctm.SA_Case_Group desc
+SELECT * FROM SATenantConsolidated_Tabs3_and_MyCase..sma_MST_CaseGroup smcg
+
+select distinct map.SA_Case_Group, cg.cgpnCaseGroupID, cg.cgpsCode, cg.cgpsDscrptn FROM SATenantConsolidated_Tabs3_and_MyCase..sma_MST_CaseGroup cg
+join CaseTypeMap map on map.SA_Case_Group = cg.cgpsDscrptn
+
+-- types
+SELECT distinct ctm.SA_Case_Type FROM CaseTypeMap ctm order by ctm.SA_Case_Type desc
+SELECT * FROM SATenantConsolidated_Tabs3_and_MyCase..sma_MST_CaseType smct
+
+SELECT * FROM Baldante_Highrise..contacts c
