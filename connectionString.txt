@@ -1,0 +1,3 @@
+Data Source=LBFR-PHI-SQL-01; Initial Catalog=SATenantConsolidated_Tabs3_and_MyCase; User Id =SmartAdvocate; Password=ALLzU@R^a8#dk*of; Connection Timeout=10000
+
+
