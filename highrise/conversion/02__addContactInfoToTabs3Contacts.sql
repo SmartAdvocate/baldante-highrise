@@ -257,7 +257,7 @@ insert into [sma_MST_ContactNumbers]
 		on cn.cnnnContactID = ioci.CID
 			and cn.cnnnContactCtgID = ioci.CTG
 			and cn.cnnsContactNumber = LEFT(dbo.FormatPhone(p.phone_number), 30)
-			and cn.cnnnPhoneTypeID = t.ctynContactNoTypeID
+			--and cn.cnnnPhoneTypeID = t.ctynContactNoTypeID
 	where
 		ISNULL(p.phone_number, '') <> ''
 		and cn.cnnnContactNumberID is null
