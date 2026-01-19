@@ -83,3 +83,35 @@ SELECT distinct ctm.SA_Case_Type FROM CaseTypeMap ctm order by ctm.SA_Case_Type 
 SELECT * FROM SATenantConsolidated_Tabs3_and_MyCase..sma_MST_CaseType smct
 
 SELECT * FROM Baldante_Highrise..contacts c
+
+
+
+/* ------------------------------------------------------------------------------
+2026.01.19
+*/ ------------------------------------------------------------------------------
+SELECT * FROM [sma_MST_ContactNumbers] where cnnnContactID = 12663
+
+SELECT * FROM [sma_MST_ContactNumbers] where cnnnContactID = 2619
+
+SELECT * FROM Baldante_Highrise..phone p join Baldante_Highrise..contacts c on c.id = p.contact_id where c.name like '%dixon%'
+
+SELECT * 
+FROM Baldante_Highrise..emails e where contact_id = 343188676
+
+SELECT * 
+FROM Baldante_Highrise..emails e where company_id = 344778563
+
+SELECT * 
+FROM Baldante_Highrise..tasks t where t.contact_id=343509826
+
+
+join Baldante_Highrise..contacts c on c.id = e.contact_id
+where c.name like '%dixon%'
+
+SELECT * FROM [sma_TRN_TaskNew] where tskcaseid=56170
+
+SELECT * FROM sma_trn_cases where casncaseid=32818
+where source_id='343509826'
+
+
+SELECT * FROM Baldante_Highrise..contacts c where c.background is not null
