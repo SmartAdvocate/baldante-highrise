@@ -311,7 +311,7 @@ insert into [sma_MST_ContactNumbers]
 		indv.cinnContactCtg						 as cnnncontactctgid,
 		indv.cinnContactID						 as cnnncontactid,
 		t.ctynContactNoTypeID					 as cnnnphonetypeid,
-		LEFT(dbo.parsePhone(p.phone_number), 30) as cnnscontactnumber,
+		LEFT(dbo.parsePhone(p.phone_number), 20) as cnnscontactnumber,
 		null									 as cnnsextension,
 		1										 as cnnbprimary,
 		null									 as cnnbvisible,
