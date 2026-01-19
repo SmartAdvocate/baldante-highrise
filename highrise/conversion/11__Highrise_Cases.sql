@@ -234,9 +234,10 @@ if OBJECT_ID('conversion.Highrise_Case_Staging', 'U') is not null
 
 create table conversion.Highrise_Case_Staging (
 	StagingID		   INT identity (1, 1) primary key,
-	source_id		   INT,
 	source_table	   VARCHAR(20), -- 'contacts' or 'company'
-	company_name	   VARCHAR(100),
+	source_id		   INT,
+	contact_name	   VARCHAR(255),
+	company_name	   VARCHAR(255),
 	tags			   VARCHAR(MAX),
 	PrimaryTag		   VARCHAR(MAX),
 	MappedStateID	   INT,
@@ -250,11 +251,12 @@ go
 ------------------------------------------------------------------------------ */
 insert into conversion.Highrise_Case_Staging
 	(
-		source_id, source_table, company_name, tags
+		source_table, source_id, contact_name, company_name, tags
 	)
 	select
-		c.id		   as source_id,
 		'contacts'	   as source_table,
+		c.id		   as source_id,
+		c.name		   as contact_name,
 		c.company_name as company_name,
 		c.tags		   as tags
 	from Baldante_Highrise..contacts c
@@ -266,10 +268,11 @@ insert into conversion.Highrise_Case_Staging
 	union all
 
 	select
-		com.id,
-		'company',
-		com.Name,
-		null as tags
+		'company' as source_table,
+		com.id	  as source_id,
+		null	  as contact_name,
+		com.Name  as company_name,
+		null	  as tags
 	from Baldante_Highrise..company com
 	left join sma_TRN_Cases cas on cas.cassCaseNumber = com.Name
 			and cas.source_db = 'Tabs3'
@@ -277,8 +280,11 @@ insert into conversion.Highrise_Case_Staging
 		cas.casnCaseID is null;
 go
 
+select * from conversion.Highrise_Case_Staging
+
 /* ------------------------------------------------------------------------------
 3. State mapping using case tags
+PrimaryTag is only populated if the tag is found in [HighriseTagStateMap]
 ------------------------------------------------------------------------------ */
 update staging
 set staging.PrimaryTag = ct.SingleTag,
@@ -289,10 +295,11 @@ cross apply (
 	select top 1
 		tag.SingleTag,
 		tag.ordinal
-	from baldante_highrise.conversion.ContactTags tag
+	from Baldante_Highrise.conversion.ContactTags tag
 		join conversion.HighriseTagStateMap map
 			on tag.SingleTag = map.TagName
-	where tag.id = staging.source_id
+	--where tag.id = staging.source_id
+	where tag.name = staging.contact_name
 	order by tag.ordinal asc
 ) ct
 -- 3b. Lookup the SingleTag fetched in part 1 to get the mapped State
@@ -308,6 +315,9 @@ update conversion.Highrise_Case_Staging
 set MappedStateID = 2
 where MappedStateID is null;
 go
+
+select * from conversion.Highrise_Case_Staging
+
 
 /* ------------------------------------------------------------------------------
 4. Map Case Type (Priority 1: Sex Abuse Map)
@@ -387,6 +397,21 @@ go
 
 -- FINAL CHECK
 select * from conversion.Highrise_Case_Staging
+
+select
+	s.source_table,
+	s.company_name																																		   as [Case Number/Name],
+	s.contact_name																																		   as [Highrise Contact],
+	s.tags																																				   as [Raw Tags (Source)],
+	s.PrimaryTag																																		   as [Tag Used for Mapping],
+	map.StateAbbreviation																																   as [Mapped Abbrev],
+	st.sttsDescription																																	   as [SA State Name],
+	s.MappedStateID																																		   as [SA State ID],
+	case when s.PrimaryTag is null then 'Fallback (No valid Tag found)' when map.TagName is not null then 'Mapped via Dictionary' else 'Error/Unknown' end as [Mapping Logic Path]
+from conversion.Highrise_Case_Staging s
+left join conversion.HighriseTagStateMap map on s.PrimaryTag = map.TagName
+left join sma_MST_States st on s.MappedStateID = st.sttnStateID
+order by [Mapping Logic Path], [Mapped Abbrev];
 
 /* ------------------------------------------------------------------------------
 Insert [sma_TRN_Cases] that don't yet exist from [contacts]
@@ -482,7 +507,7 @@ insert into [sma_TRN_Incidents]
 	(
 		[CaseId],
 		[IncidentDate],
-		[StateID],           -- Updated to use Mapping
+		[StateID],
 		[LiabilityCodeId],
 		[IncidentFacts],
 		[MergedFacts],
@@ -494,27 +519,29 @@ insert into [sma_TRN_Incidents]
 		[DtModified]
 	)
 	select
-		cas.casnCaseID	as [CaseId],
-		GETDATE()		as [IncidentDate],
-		stg.MappedStateID as [StateID], -- Pulling from our refined staging table
-		0				as [LiabilityCodeId],
-		''				as [IncidentFacts],
-		''				as [MergedFacts],
-		null			as [Comments],
-		null			as [IncidentTime],
-		368				as [RecUserID],
-		GETDATE()		as [DtCreated],
-		null			as [ModifyUserId],
-		null			as [DtModified]
+		cas.casnCaseID	  as [CaseId],
+		GETDATE()		  as [IncidentDate],
+		stg.MappedStateID as [StateID],
+		0				  as [LiabilityCodeId],
+		c.background	  as [IncidentFacts],
+		''				  as [MergedFacts],
+		null			  as [Comments],
+		null			  as [IncidentTime],
+		368				  as [RecUserID],
+		GETDATE()		  as [DtCreated],
+		null			  as [ModifyUserId],
+		null			  as [DtModified]
+	--select *
 	from conversion.Highrise_Case_Staging stg
-	join [sma_TRN_cases] cas
-		on cas.source_id = stg.source_id
-		and cas.source_db = 'highrise'
-		and cas.source_ref = stg.source_table
+	join [sma_TRN_cases] cas on cas.source_id = stg.source_id
+			and cas.source_db = 'highrise'
+			and cas.source_ref = stg.source_table
+	left join Baldante_Highrise..contacts c on stg.source_table = 'contacts'
+			and c.id = stg.source_id
+	--where c.background is not null
 	-- Ensure we don't create duplicate incidents if re-run
-	where not exists (
-		select 1 from [sma_TRN_Incidents] i where i.CaseId = cas.casnCaseID
-	);
+	where
+		not exists (select 1 from [sma_TRN_Incidents] i where i.CaseId = cas.casnCaseID);
 go
 
 alter table [sma_TRN_Incidents] enable trigger all
@@ -527,12 +554,12 @@ alter table [sma_TRN_Cases] disable trigger all
 go
 
 update cas
-set 
-    cas.casdIncidentDate = inc.IncidentDate,
-	cas.casnStateID      = inc.StateID,
-	cas.casnState        = inc.StateID
+set cas.casdIncidentDate = inc.IncidentDate,
+	cas.casnStateID = inc.StateID,
+	cas.casnState = inc.StateID
 from sma_trn_cases as cas
-join sma_TRN_Incidents as inc on cas.casnCaseID = inc.CaseId
+join sma_TRN_Incidents as inc
+	on cas.casnCaseID = inc.CaseId
 where cas.source_db = 'highrise';
 go
 
