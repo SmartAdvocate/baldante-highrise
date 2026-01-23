@@ -66,6 +66,7 @@ def main(directory, engine, console):
                     extract_contact(file_path, engine, progress=progress)
             except Exception as e:
                 logger.error(f"Error processing {filename}: {e}")
+                progress.console.print(f"[red]ERROR: {filename}: {e}[/red]")
 
             progress.advance(task)
 
