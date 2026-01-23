@@ -64,6 +64,7 @@ def parse_contact_header(data, file_path):
     
     contact_header = data[0]
     
+    company_info = None
     if len(data) > 1:
         company_info = {
             'ID': data[1].get('ID'),
