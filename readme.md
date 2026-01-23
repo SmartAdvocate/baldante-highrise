@@ -157,9 +157,9 @@ select * from Baldante..tasks
 recording: `Y:\Jimmys Stuff\video1566446156.mp4`
 
 workspace:
-`C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking`
-`C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking\Baldante_Linking_Info.txt`
-`C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking\Import Folders`
+- `C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking`
+- `C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking\Baldante_Linking_Info.txt`
+- `C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking\Import Folders`
 
 - [ ] desktop > `net8.0-windows` > DocumentLinking.exe
 - [ ] Enter connection string from `C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking\Baldante_Linking_Info.txt`
@@ -189,11 +189,8 @@ copy their work into a blank doc linking sheet
 upload that sheet
 
 
-2. For each csv in `C:\Users\smrtadvadmin\Documents\Document Linking\Case_Folders_Imports`
-
 
 ![alt text](image-1.png)
 
 
-- C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking
 - C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking

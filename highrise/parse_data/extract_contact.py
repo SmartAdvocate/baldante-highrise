@@ -29,7 +29,7 @@ def process_phones(contact_id, phone_list, engine, file_path, progress):
         phone_data = {'contact_id': contact_id, 'phone_number': phone_number}
         try:
             insert_to_sql_server(file_path, engine, 'phone', phone_data, console=progress.console if progress else None)
-            logger.info(f"Inserted Phone record: {phone_data}")
+            # logger.info(f"Inserted Phone record: {phone_data}")
         except Exception as e:
             _handle_insert_error('phone', phone_number, file_path, e, progress)
 
@@ -38,7 +38,7 @@ def process_emails(contact_id, email_list, engine, file_path, progress):
         email_data = {'contact_id': contact_id, 'email_address': email_address}
         try:
             insert_to_sql_server(file_path, engine, 'email_address', email_data, console=progress.console if progress else None)
-            logger.info(f"Inserted Email record: {email_data}")
+            # logger.info(f"Inserted Email record: {email_data}")
         except Exception as e:
             _handle_insert_error('email', email_address, file_path, e, progress)
 
@@ -48,7 +48,7 @@ def process_addresses(contact_id, address_list, engine, file_path, progress):
         address_data = {'contact_id': contact_id, 'address': formatted_address}
         try:
             insert_to_sql_server(file_path, engine, 'address', address_data, console=progress.console if progress else None)
-            logger.info(f"Inserted Address record: {address_data}")
+            # logger.info(f"Inserted Address record: {address_data}")
         except Exception as e:
             _handle_insert_error('address', formatted_address, file_path, e, progress)
 
@@ -188,6 +188,7 @@ def extract_contact(file_path, engine, progress=None):
     # Contact Header
     contact_data = parse_contact_header(data, file_path)
     insert_to_sql_server(file_path, engine, 'contacts', contact_data, console=progress.console if progress else None)
+    logger.info(f"Inserted Contact record: {contact_data}")
 
     # Contact Information
     parse_contact_info(data, contact_data['id'], engine, file_path, progress)

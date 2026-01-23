@@ -341,6 +341,9 @@ case when ISNULL(map.Secondary_Tags, '') <> '' then '%' + map.Secondary_Tags + '
 and ISNULL(map.AdditionalCondition, '') not like 'Plaintiff DOB%';	-- exclude this condition until next step
 go
 
+select * from conversion.Highrise_Case_Staging where MappedCaseTypeID is not null
+
+
 /* ------------------------------------------------------------------------------
 5. Map Case Type (Priority 1.5: DOB Age Window Mappings)
 DISREGARD - no DOB for Highrise contacts
@@ -396,7 +399,7 @@ where s.MappedCaseTypeID is null;
 go
 
 -- FINAL CHECK
-select * from conversion.Highrise_Case_Staging
+select * from conversion.Highrise_Case_Staging where MappedCaseTypeID is null
 
 select
 	s.source_table,
@@ -541,7 +544,8 @@ insert into [sma_TRN_Incidents]
 	--where c.background is not null
 	-- Ensure we don't create duplicate incidents if re-run
 	where
-		not exists (select 1 from [sma_TRN_Incidents] i where i.CaseId = cas.casnCaseID);
+		not exists (select 1 from [sma_TRN_Incidents] i where i.CaseId = cas.casnCaseID)
+		and c.background is not null;
 go
 
 alter table [sma_TRN_Incidents] enable trigger all

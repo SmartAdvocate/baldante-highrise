@@ -181,6 +181,8 @@ insert into dbo.stg_Highrise_Tasks
 		final.row_num = 1;
 go
 
+select * from stg_Highrise_Tasks
+
 ---- tasks from [contacts] for highrise cases
 --select
 --	'contacts' as source_table,
@@ -376,8 +378,8 @@ insert into [sma_TRN_TaskNew]
 			and iu.Syst = 'HR'
 		order by iu.SAusrnUserID -- Or another criteria to pick the "best" user match
 	) iu
-	where
-		cas_casnCaseID = 56170
+	--where
+		--cas_casnCaseID = 56170
 --left join implementation_users iu
 --	on iu.Staff = t.author
 --		and iu.Syst = 'HR'

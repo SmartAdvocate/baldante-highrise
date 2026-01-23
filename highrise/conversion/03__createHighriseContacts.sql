@@ -365,22 +365,22 @@ where A.RowNumber <> 1
 and A.ContactNumberID = cnnnContactNumberID
 
 
-update [sma_MST_ContactNumbers]
-set cnnbPrimary = 0
-from (
- select
-	 ROW_NUMBER() over (partition by cnnnContactID order by cnnnContactNumberID) as RowNumber,
-	 cnnnContactNumberID														 as ContactNumberID
- from [sma_MST_ContactNumbers]
- where cnnnContactCtgID = (
-	  select
-		  ctgnCategoryID
-	  from [sma_MST_ContactCtg]
-	  where ctgsDesc = 'Organization'
-	 )
-) A
-where A.RowNumber <> 1
-and A.ContactNumberID = cnnnContactNumberID
+--update [sma_MST_ContactNumbers]
+--set cnnbPrimary = 0
+--from (
+-- select
+--	 ROW_NUMBER() over (partition by cnnnContactID order by cnnnContactNumberID) as RowNumber,
+--	 cnnnContactNumberID														 as ContactNumberID
+-- from [sma_MST_ContactNumbers]
+-- where cnnnContactCtgID = (
+--	  select
+--		  ctgnCategoryID
+--	  from [sma_MST_ContactCtg]
+--	  where ctgsDesc = 'Organization'
+--	 )
+--) A
+--where A.RowNumber <> 1
+--and A.ContactNumberID = cnnnContactNumberID
 
 
 alter table [sma_MST_ContactNumbers] enable trigger all
