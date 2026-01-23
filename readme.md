@@ -151,3 +151,49 @@ select * from Baldante..company
 select * from Baldante..notes
 select * from Baldante..tasks
 ```
+
+
+# Doc Linking
+recording: `Y:\Jimmys Stuff\video1566446156.mp4`
+
+workspace:
+`C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking`
+`C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking\Baldante_Linking_Info.txt`
+`C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking\Import Folders`
+
+- [ ] desktop > `net8.0-windows` > DocumentLinking.exe
+- [ ] Enter connection string from `C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking\Baldante_Linking_Info.txt`
+- [ ] Enter output dir: `C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking`
+
+## Generate document mapping spreadsheets
+- [ ] Import Folders from `C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking\Import Folders`
+	- [ ] `Clergy_CaseFoldersList_20260119.csv`
+	- [ ] `Drug_CaseFolders.csv`
+	- [ ] `NFL_CaseFolders.csv`
+	- [ ] `Staff_CaseFolders.csv`
+5. Enter token: `baldante`
+6. Generate Excel. result goes to output dir
+7. rename result file, i.e. `staff_`, `NFL_`
+8. verify there are some case matches
+
+## Upload document mapping spreadsheets (link documents to cases)
+after all 4 created: 
+- [ ] Select each prefixed file 
+upload csv to database
+email output sheets to sue
+
+
+## Linking Exceptions
+client will fills out exceptions and possible matches
+copy their work into a blank doc linking sheet
+upload that sheet
+
+
+2. For each csv in `C:\Users\smrtadvadmin\Documents\Document Linking\Case_Folders_Imports`
+
+
+![alt text](image-1.png)
+
+
+- C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking
+- C:\Users\smrtadvadmin\Documents\Document Linking\2026-01-23 Live Document Linking
