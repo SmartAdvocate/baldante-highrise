@@ -31,7 +31,11 @@ def create_tables(engine):
     address_table = Table('address', metadata,
         Column('id', Integer, primary_key=True, autoincrement=True),
         Column('contact_id', Integer),  # Add foreign key to 'contacts'
-        Column('address', String)
+        Column('address', String),
+        Column('street', String),
+        Column('city', String),
+        Column('state', String),
+        Column('zip', String)
     )
 
     notes_table = Table('notes', metadata,

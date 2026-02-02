@@ -280,7 +280,7 @@ insert into conversion.Highrise_Case_Staging
 		cas.casnCaseID is null;
 go
 
-select * from conversion.Highrise_Case_Staging
+select * from conversion.Highrise_Case_Staging order by company_name
 
 /* ------------------------------------------------------------------------------
 3. State mapping using case tags

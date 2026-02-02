@@ -1,4 +1,5 @@
 import logging
+import re
 from pathlib import Path
 
 # Highrise functions
@@ -17,6 +18,42 @@ from rich.console import Console
 logger = logging.getLogger(__name__)
 console = Console()
 
+
+def clean_and_parse_address(raw_address):
+    """
+    Parses messy addresses like: 
+    'Inmate # QP3589 SCI Mahanoy 301 Grey Line Drive, Frackville, PA, 17931'
+    """
+    # Standardize: remove trailing commas and line breaks
+    addr = raw_address.replace('\n', ', ').strip().strip(',')
+    parts = [p.strip() for p in addr.split(',')]
+    
+    result = {
+        'street': addr, # Default to full string if parsing fails
+        'city': None,
+        'state': None,
+        'zip': None
+    }
+
+    # Work backwards from the end of the list
+    # 1. Check for Zip (5 digits)
+    if parts and re.search(r'\d{5}', parts[-1]):
+        result['zip'] = parts.pop()
+    
+    # 2. Check for State (usually 2 chars or full name)
+    if parts:
+        result['state'] = parts.pop()
+        
+    # 3. Check for City
+    if parts:
+        result['city'] = parts.pop()
+        
+    # 4. Remaining parts are the street (including the 'Inmate #' noise)
+    if parts:
+        result['street'] = ', '.join(parts)
+        
+    return result
+
 def _handle_insert_error(entity_type, identifier, file_path, error, progress):
     """Unified error logging for contact detail inserts."""
     msg = f"FAIL: insert {entity_type} {identifier} from {file_path}: {error}"
@@ -29,7 +66,7 @@ def process_phones(contact_id, phone_list, engine, file_path, progress):
         phone_data = {'contact_id': contact_id, 'phone_number': phone_number}
         try:
             insert_to_sql_server(file_path, engine, 'phone', phone_data, console=progress.console if progress else None)
-            # logger.info(f"Inserted Phone record: {phone_data}")
+            logger.info(f"Inserted Phone record: {phone_data}")
         except Exception as e:
             _handle_insert_error('phone', phone_number, file_path, e, progress)
 
@@ -38,19 +75,40 @@ def process_emails(contact_id, email_list, engine, file_path, progress):
         email_data = {'contact_id': contact_id, 'email_address': email_address}
         try:
             insert_to_sql_server(file_path, engine, 'email_address', email_data, console=progress.console if progress else None)
-            # logger.info(f"Inserted Email record: {email_data}")
+            logger.info(f"Inserted Email record: {email_data}")
         except Exception as e:
             _handle_insert_error('email', email_address, file_path, e, progress)
 
 def process_addresses(contact_id, address_list, engine, file_path, progress):
     for address in address_list:
-        formatted_address = address.strip() if isinstance(address, str) else ', '.join([line.strip() for line in address.splitlines()])
-        address_data = {'contact_id': contact_id, 'address': formatted_address}
+        # Handle both strings and multiline objects
+        raw_str = address if isinstance(address, str) else ', '.join([line.strip() for line in address.splitlines()])
+        
+        # Parse the address components
+        parsed = clean_and_parse_address(raw_str)
+        
+        address_data = {
+            'contact_id': contact_id, 
+            'address': raw_str, # Keep the original just in case
+            'street': parsed['street'],
+            'city': parsed['city'],
+            'state': parsed['state'],
+            'zip': parsed['zip']
+        }
+        
         try:
             insert_to_sql_server(file_path, engine, 'address', address_data, console=progress.console if progress else None)
-            # logger.info(f"Inserted Address record: {address_data}")
+            logger.info(f"Inserted Parsed Address: {parsed['city']}, {parsed['state']}")
         except Exception as e:
-            _handle_insert_error('address', formatted_address, file_path, e, progress)
+            _handle_insert_error('address', raw_str, file_path, e, progress)
+    # for address in address_list:
+    #     formatted_address = address.strip() if isinstance(address, str) else ', '.join([line.strip() for line in address.splitlines()])
+    #     address_data = {'contact_id': contact_id, 'address': formatted_address}
+    #     try:
+    #         insert_to_sql_server(file_path, engine, 'address', address_data, console=progress.console if progress else None)
+    #         logger.info(f"Inserted Address record: {address_data}")
+    #     except Exception as e:
+    #         _handle_insert_error('address', formatted_address, file_path, e, progress)
 
 def parse_contact_header(data, file_path):
     """ Contact Record -----------------------------------------------------------------------------
@@ -89,11 +147,21 @@ def parse_contact_header(data, file_path):
     return contact_data
 
 def parse_contact_info(data, contact_id, engine, file_path, progress=None):
-    if len(data) <= 2 or 'Contact' not in data[2]:
+    
+    # if len(data) <= 2 or 'Contact' not in data[2]:
+    #     return
+
+    # contact_items = data[2]['Contact']
+    
+    # Find the dictionary that contains the 'Contact' key
+    contact_block = next((item for item in data if isinstance(item, dict) and 'Contact' in item), None)
+
+    if not contact_block:
+        logger.warning(f"No 'Contact' block found in {file_path}. Data length: {len(data)}")
         return
 
-    contact_items = data[2]['Contact']
-        
+    contact_items = contact_block['Contact']
+
     for item in contact_items:
         if not isinstance(item, list) or not item:
             continue

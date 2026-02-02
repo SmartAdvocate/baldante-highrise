@@ -188,6 +188,10 @@ client will fills out exceptions and possible matches
 copy their work into a blank doc linking sheet
 upload that sheet
 
+1. copy their work from Potential Case Matches and Case Exceptions tabs into the Case Matches tab of a blank worksheet
+2. upload exception sheets
+
+`=IF(ISNUMBER(SEARCH(".", A2)), TEXT(A2, "00000.000"), TEXT(A2, "00000"))`
 
 
 ![alt text](image-1.png)
